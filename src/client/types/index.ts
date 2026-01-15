@@ -1,0 +1,1 @@
+export type Tense = "present" | "past";

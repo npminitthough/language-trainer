@@ -1,0 +1,64 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+enum VerbType {
+  sound
+  hollow
+}
+
+enum Variant {
+  fusha
+  levantine
+}
+
+enum Tense {
+  past
+  present
+}
+
+enum Pronoun {
+  1s
+  2sf
+  2sm
+  3sf
+  3sm
+  2p
+  3p
+}
+
+Table users {
+  id uuid [primary key]
+  username varchar
+  email varchar [unique]
+  password_hash varchar2
+  created_at timestamp
+}
+
+Table verbs {
+  id uuid [primary key]
+  english_gloss varchar
+  lemma varchar
+  variant Variant
+  transliteration varchar
+  root1 char
+  root2 char
+  root3 char
+  type VerbType
+  created_at timestamp
+}
+
+Table user_attempts {
+  id uuid [primary key]
+  user_id uuid 
+  verb_id uuid 
+  pronoun Pronoun
+  tense Tense
+  is_correct boolean
+  user_answer varchar
+  correct_answer varchar
+  created_at timestamp
+}
+
+Ref: user_attempts.user_id > users.id 
+
+Ref: user_attempts.verb_id > verbs.id 

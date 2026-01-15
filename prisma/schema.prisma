@@ -1,0 +1,77 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+// ===== Enums =====
+enum VerbType {
+  sound
+  hollow
+}
+
+enum Tense {
+  past
+  present
+}
+
+enum Pronoun {
+  firstPersonSingular  @map("1s")
+  secondPersonMascSingular @map("2sm")
+  secondPersonFemSingular  @map("2sf")
+  thirdPersonMascSingular  @map("3sm")
+  thirdPersonFemSingular   @map("3sf")
+  secondPersonPlural       @map("2p")
+  thirdPersonPlural        @map("3p")
+}
+
+enum Variant {
+  fusha
+  levantine
+}
+
+// ===== Models =====
+model User {
+  id           String        @id @default(uuid())
+  username     String
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  attempts     UserAttempt[]
+}
+
+model Verb {
+  id              String        @id @default(uuid())
+  englishGloss    String
+  lemma           String
+  transliteration String
+  variant         Variant
+  root1           String        @db.Char(1)
+  root2           String        @db.Char(1)
+  root3           String        @db.Char(1)
+  type            VerbType
+  createdAt       DateTime      @default(now())
+  attempts        UserAttempt[]
+}
+
+model UserAttempt {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  verb          Verb     @relation(fields: [verbId], references: [id])
+  verbId        String
+  pronoun       Pronoun
+  tense         Tense
+  isCorrect     Boolean
+  userAnswer    String
+  correctAnswer String
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([verbId])
+}
